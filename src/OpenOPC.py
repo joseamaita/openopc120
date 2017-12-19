@@ -16,7 +16,7 @@ import string
 import socket
 import re
 import Pyro4.core
-from multiprocessing import Queue
+from queue import Queue
 
 __version__ = '1.2.0'
 
