@@ -16,7 +16,7 @@ import string
 import socket
 import re
 import Pyro4.core
-from multiprocessing import Queue
+from queue import Queue
 
 __version__ = '1.2.0'
 
@@ -933,7 +933,7 @@ class client():
                count, property_id, descriptions, datatypes = self._opc.QueryAvailableProperties(tag)
 
                # Remove bogus negative property id (not sure why this sometimes happens)
-               tag_properties = map(None, property_id, descriptions)
+               tag_properties = zip(property_id, descriptions)
                property_id = [p for p, d in tag_properties if p > 0]
                descriptions = [d for p, d in tag_properties if p > 0]
 
@@ -973,9 +973,9 @@ class client():
                   else:
                      tag_properties = [values]
                else:
-                  tag_properties = map(None, property_id, values)
+                  tag_properties = zip(property_id, values)
             else:
-               tag_properties = map(None, property_id, descriptions, values)
+               tag_properties = list(zip(property_id, descriptions, values))
                tag_properties.insert(0, (0, 'Item ID (virtual property)', tag))
 
             if include_name:    tag_properties.insert(0, (0, tag))
