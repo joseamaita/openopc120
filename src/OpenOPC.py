@@ -17,6 +17,7 @@ import socket
 import re
 import Pyro4.core
 from multiprocessing import Queue
+from datetime import datetime, timezone
 
 __version__ = '1.2.0'
 
@@ -30,8 +31,11 @@ if os.name == 'nt':
       import win32event
       import pythoncom
       import pywintypes
+      import win32timezone
       import SystemHealth
       
+      # Extract Local Timezone
+      LOCAL_TIMEZONE = datetime.now(timezone.utc).astimezone().tzinfo
       # Win32 variant types
       pywintypes.datetime = pywintypes.TimeType
       vt = dict([(pythoncom.__dict__[vtype], vtype) for vtype in pythoncom.__dict__.keys() if vtype[:2] == "VT"])
@@ -513,7 +517,12 @@ class client():
                    for i,tag in enumerate(valid_tags):
                       tag_value[tag] = values[i]
                       tag_quality[tag] = qualities[i]
-                      tag_time[tag] = timestamps[i]
+                      # tag_time[tag] = timestamps[i]
+                      if timestamps[i]:
+                        timestamp = timestamps[i].astimezone(LOCAL_TIMEZONE)
+                      else:
+                        timestamp = timestamps[i]
+                      tag_time[tag] = timestamp
                       tag_error[tag] = errors[i]
 
             # Async Read
@@ -551,7 +560,12 @@ class client():
                      tag = self._group_handles_tag[sub_group][h]
                      tag_value[tag] = values[i]
                      tag_quality[tag] = qualities[i]
-                     tag_time[tag] = timestamps[i]
+                     # tag_time[tag] = timestamps[i]                     
+                     if timestamps[i]:
+                        timestamp = timestamps[i].astimezone(LOCAL_TIMEZONE)
+                     else:
+                        timestamp = timestamps[i]
+                     tag_time[tag] = timestamp
             
             for tag in tags:
                if tag in tag_value:
